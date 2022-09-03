@@ -1,0 +1,91 @@
+#header {
+    top: 0;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #a3a3a3;
+    padding: 7px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+}
+#header h1 a img {
+    width: 100px;
+}
+.wrapper {
+    width: 50%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.search {
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0f0f0;
+    border-radius: 7px;
+    color: #a1a1a1;
+}
+.search label img {
+    margin-right: 8px;
+}
+.search input::placeholder {
+    color: #a1a1a1;
+}
+.nav ul {
+    display: flex;
+    align-items: center;
+}
+.nav ul li {
+    margin-right: 20px;
+}
+.nav ul li:last-child{
+    margin-right: 0;
+}
+.nav ul li img {
+    width: 22px;
+    cursor: pointer;
+}
+#header .nav ul li .profile {
+    width: 25px;
+    border-radius: 50%;
+    border: 1px solid #111;
+}
+
+#profile-container {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+}
+#profile-container .menu-container {
+    /* position:fixed; */
+    border: 1px solid #ccc;
+    position: fixed;
+    background: #fff;
+    right: 416px;
+    /* top: -30px; */
+    top: 70px;
+}
+#profile-container .menu-container ul {
+    width: max-content;
+}
+#profile-container .menu-container ul li {
+    padding: 10px 20px;
+    cursor: pointer;
+    /* margin: 10px 0; */
+}
+#profile-container .menu-container ul li:hover {
+    background: #f3f3f3;
+}
+#profile-container .menu-container ul li a {
+    display: flex;
+    /* justify-content: space-between; */
+}
+#profile-container .menu-container ul li img {
+    margin-right: 25px;
+}
+#profile-container .menu-container ul li span {
+    display: inline-block;
+    width: 90px;
+}

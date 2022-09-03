@@ -1,0 +1,131 @@
+#login {
+    background: #fff;
+    font-size: 20px;
+    display: flex;
+    height: 100vh;
+}
+#login .left {
+    height: 100%;
+    width: 35%;
+    border-top-right-radius: 40px;
+    border-bottom-right-radius: 40px;
+    background-color: #3aada5;
+}
+#login .left.signup {
+    border-radius: 0;
+    border-top-left-radius: 40px;
+    border-bottom-left-radius: 40px;
+}
+#login .left img.logo {
+    position: absolute;
+    width: 150px;
+    left: 20px;
+    top: 20px;
+}
+
+#login .left .wrapper {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#login .left .content {
+    text-align: center;
+}
+#login .left .content h1 {
+    font-size: 40px;
+    font-weight: 600;
+    color: #fff;
+}
+#login .left .content p {
+    font-size: 18px;
+    width: 70%;
+    color: rgba(255, 255, 255, 0.748);
+    margin: 50px auto;
+}
+#login .left .content a.btn {
+    padding: 15px 35px;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 30px;
+}
+#login .left .content a.btn:hover {
+    background: #fff;
+    color: #3aada5;
+}
+
+#login .right {
+    width: 65%;
+    padding: 30px;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+#login .right .right-wrapper {
+    width: 50%;
+}
+#login .right h1 {
+    text-align: center;
+    font-size: 40px;
+    font-weight: 600;
+    color: #3aada5;
+    margin: 150px 0 50px;
+}
+#login .right .wrapp {
+    display: flex;
+    justify-content: center;
+}
+#login .right ul.social {
+    display: flex;
+    width:max-content;
+}
+#login .right ul.social li {
+    margin: 10px;
+}
+#login .right ul.social li img {
+    width: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 10px;
+    border: 2px solid #111;
+}
+#login .right p {
+    text-align: center;
+    font-weight: 600;
+    color: #1116;
+    margin: 50px 0 ;
+}
+#login .right form {
+    width: 40%;
+}
+#login .right form div.input-container {
+    background: #3aada50f;
+    width: 100%;
+    padding: 15px 35px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+#login .right form div.input-container label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#login .right form div.input-container label img {
+    width: 20px;
+    margin-right: 20px;
+}
+#login .right form div.input-container input {
+    font-size: 19px;
+}
+#login .right form button[type="submit"] {
+    margin-top: 45px;
+    padding: 20px 75px;
+    background: #3aada5;
+    color: #fff;
+    font-weight: 600;
+    font-size: 19px;
+    cursor: pointer;
+    border-radius: 30px;
+}

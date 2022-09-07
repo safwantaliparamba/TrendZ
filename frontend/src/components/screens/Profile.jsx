@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link, Outlet } from "react-router-dom";
 
 import axios from "../../config/axiosConfig";
 import profile from "../../assets/images/blank-profile.webp";
@@ -12,6 +12,7 @@ import { alertActions } from "../../store/alertSlice";
 
 function Profile() {
     const access = useSelector((state) => state.auth.token.access);
+    const userData = useSelector((state) => state.auth.userData);
     const [userObject, setUserObject] = useState({});
     const [isAuthor, setIsAuthor] = useState(false);
     // const [isFollowing, setIsFollowing] = useState(false);
@@ -47,65 +48,72 @@ function Profile() {
             })
             .catch((err) => {
                 console.log(err);
-                if (err.response.status === 401){
-                    dispatch(authActions.logout())
+                if (err.response.status === 401) {
+                    dispatch(authActions.logout());
                 }
             });
-    }, [username]);
+    }, [username,userData]);
 
     return (
         <>
             {isLoading ? (
                 <MainLoader />
             ) : (
-                <TopWrapper>
-                    <TopLeft className="left">
-                        <img
-                            src={
-                                userObject?.image ? userObject?.image : profile
-                            }
-                            alt=""
-                        />
-                    </TopLeft>
-                    <TopRight className="right">
-                        <NameContainer>
-                            <h3>{userObject?.user?.username}</h3>
-                            {isAuthor ? (
-                                <img src={settings} alt="" />
-                            ) : (
-                                <span
-                                    className="btn"
-                                    onClick={(e) =>
-                                        dispatch(
-                                            alertActions.addAlert({
-                                                type: "success",
-                                                message:
-                                                    "successfully following this user",
-                                            })
-                                        )
-                                    }
-                                >
-                                    follow
-                                </span>
-                            )}
-                        </NameContainer>
-                        <FollowDetails>
-                            <h5>
-                                <span>0</span>posts
-                            </h5>
-                            <h5>
-                                <span>28392</span>followers
-                            </h5>
-                            <h5>
-                                <span>2292</span>followings
-                            </h5>
-                        </FollowDetails>
-                        <Bio>
-                            <h4>{userObject.name}</h4>
-                            {userObject.bio && <p>{userObject.bio}</p>}
-                        </Bio>
-                    </TopRight>
-                </TopWrapper>
+                <>
+                    <TopWrapper>
+                        <TopLeft className="left">
+                            <img
+                                src={
+                                    userObject?.image
+                                        ? userObject?.image
+                                        : profile
+                                }
+                                alt=""
+                            />
+                        </TopLeft>
+                        <TopRight className="right">
+                            <NameContainer>
+                                <h3>{userObject?.user?.username}</h3>
+                                {isAuthor ? (
+                                    <Link to="settings/">
+                                        <img src={settings} alt="" />
+                                    </Link>
+                                ) : (
+                                    <span
+                                        className="btn"
+                                        onClick={(e) =>
+                                            dispatch(
+                                                alertActions.addAlert({
+                                                    type: "success",
+                                                    message:
+                                                        "successfully following this user",
+                                                })
+                                            )
+                                        }
+                                    >
+                                        follow
+                                    </span>
+                                )}
+                            </NameContainer>
+                            <FollowDetails>
+                                <h5>
+                                    <span>0</span>posts
+                                </h5>
+                                <h5>
+                                    <span>28392</span>followers
+                                </h5>
+                                <h5>
+                                    <span>2292</span>followings
+                                </h5>
+                            </FollowDetails>
+                            <Bio>
+                                <h4>{userObject.name}</h4>
+                                {userObject.bio && <p>{userObject.bio}</p>}
+                            </Bio>
+                        </TopRight>
+                    </TopWrapper>
+                    <Outlet />
+                </>
             )}
         </>
     );

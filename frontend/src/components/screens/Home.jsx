@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 
 import { authActions } from "../../store/authSlice";
+import Post from "../includes/Post";
 
 function Home() {
     const dispatch = useDispatch();
@@ -11,24 +12,19 @@ function Home() {
     // const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
     return (
         <>
-            <LinkWrapper>
-                <h1>Home</h1>
-                <button onClick={(e) => dispatch(authActions.logout())}>
-                    Logout
-                </button>
-                <Link to="/protected">protected</Link>
-                <Link to="/auth/login">login</Link>
-            </LinkWrapper>
-
-            <p>{JSON.stringify(user)}</p>
+            <MainWrapper>
+                <Post />
+            </MainWrapper>
         </>
     );
 }
 
 export default Home;
 
-const LinkWrapper = styled.div`
-    margin-top: 100px;
+const MainWrapper = styled.div`
+    width: 40%;
+    margin: 100px auto 0;
+    /* margin-top: 63px; */
     background: #f0f0f0;
     a {
         color: red;

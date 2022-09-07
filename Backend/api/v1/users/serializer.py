@@ -14,3 +14,19 @@ class ProfileSerializer(ModelSerializer):
     class Meta:
         model = Author
         fields = '__all__'
+
+
+class EditAuthorSerializer(ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('name','bio')
+
+class EditUserSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username','email')
+
+class GetAuthor(ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('name','bio','image')

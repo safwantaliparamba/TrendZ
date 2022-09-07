@@ -5,6 +5,7 @@ import Header from "../includes/Header";
 import Home from "../screens/Home";
 import NotFound from "../screens/NotFound";
 import Profile from "../screens/Profile";
+import ProfileSettings from "../screens/ProfileSettings";
 
 function MainRouter() {
     return (
@@ -12,7 +13,9 @@ function MainRouter() {
             <Header />
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path=":username/" element={<Profile />} />
+                <Route path=":username/*" element={<Profile />} >
+                    <Route path="settings/" element={<ProfileSettings />} />
+                </Route>
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </>

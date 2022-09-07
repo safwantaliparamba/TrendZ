@@ -14,7 +14,7 @@ import bookmark from "../../assets/icons/bookmark.svg";
 import settings from "../../assets/icons/settings.svg";
 import logout from "../../assets/icons/logout.svg";
 import profile from "../../assets/images/blank-profile.webp";
-import { alertActions } from "../../store/alertSlice";
+// import { alertActions } from "../../store/alertSlice";
 
 function Header() {
     const userData = useSelector((state) => state.auth.userData);
@@ -23,7 +23,7 @@ function Header() {
 
     useEffect(() => {
         console.log(userData);
-    });
+    },[userData,userData?.image]);
 
     return (
         <>
@@ -89,24 +89,24 @@ function Header() {
                 >
                     <div className={styles["menu-container"]}>
                         <ul>
-                            <li>
-                                <Link to={`/${userData?.username}`}>
+                            <Link to={`/${userData?.username}`}>
+                                <li>
                                     <img src={profileUser} alt="" />
                                     <span>Profile</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/saved">
+                                </li>
+                            </Link>
+                            <Link to="/saved">
+                                <li>
                                     <img src={bookmark} alt="" />
                                     <span>Saved</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/settings">
+                                </li>
+                            </Link>
+                            <Link to={`/${userData.username}/settings/`}>
+                                <li>
                                     <img src={settings} alt="" />
                                     <span>Settings</span>
-                                </Link>
-                            </li>
+                                </li>
+                            </Link>
                             <li onClick={(e) => dispatch(authActions.logout())}>
                                 <img src={logout} onClick={(e) => e} alt="" />
                                 <span>Logout</span>

@@ -26,7 +26,7 @@ function Alert(props) {
 export default Alert;
 
 const AlertWrapper = styled.div`
-    z-index: 20;
+    z-index: 100;
     background-color: #ffffff79;
     position: fixed;
     top: 0;

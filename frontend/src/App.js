@@ -20,6 +20,11 @@ function App() {
     useEffect(() => {
         console.log(alert);
         if (isAuthenticated === true) {
+            const config = {
+                headers: {
+                    authorization: `Bearer ${refreshToken.access}`,
+                },
+            };
             axios
                 .post("auth/token/refresh/", { refresh: refreshToken.refresh })
                 .then((response) => {
@@ -35,6 +40,13 @@ function App() {
                         dispatch(authActions.logout());
                     }
                 });
+
+            axios.get('users/get-user-data/',config).then(res =>{
+                console.log(res.data);
+                dispatch(authActions.updateUserData({userData:res.data}));
+            }).catch(err =>{
+                console.log(err);
+            })
         }
     }, []);
 

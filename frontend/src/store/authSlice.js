@@ -51,13 +51,18 @@ const authSlice = createSlice({
         },
         logout(state) {
             localStorage.clear();
-            return state = initialState;
+            state.isAuthenticated = false;
         },
         updateAccess(state, action) {
             state.token.access = action.payload.access;
             const token = JSON.parse(localStorage.getItem("token"));
             token.access = action.payload.access;
             localStorage.setItem("token", JSON.stringify(token));
+        },
+        updateUserData(state, { payload }) {
+            state.userData = {}
+            localStorage.setItem("userData", JSON.stringify(payload.userData));
+            state.userData = payload.userData;
         },
     },
 });

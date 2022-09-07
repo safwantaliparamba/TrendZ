@@ -44,7 +44,8 @@ function Register() {
                 if (response.data.statusCode === 6000) {
                     const token = response.data.data;
                     dispatch(authActions.loginUser({ token,profileData: response.data.userData }));
-                    navigate(`/${response.data.userData.username}`);
+                    dispatch(alertActions.addAlert({ message:'Signed up successfully, now complete your profile',type:'success'}))
+                    navigate(`/${response.data.userData.username}/settings/`);
                 }else if(response.data.statusCode === 6001){
                     dispatch(alertActions.addAlert({
                         type:'err',

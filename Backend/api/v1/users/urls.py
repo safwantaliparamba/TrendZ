@@ -3,5 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    path('<str:username>/',views.profile)
+    path('update/',views.editProfile),
+    path('get-user-data/',views.get_user_data),
+    path('<str:username>/',views.profile),
 ]

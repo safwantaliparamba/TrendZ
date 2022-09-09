@@ -15,6 +15,7 @@ import logo from "../../assets/icons/logo.png";
 import Loader from "../UI/Loader";
 import facebook from "../../assets/images/facebook-psd.png";
 import twitter from "../../assets/images/twitter-psd.png";
+import { Helmet } from "react-helmet";
 
 function Login() {
     const navigate = useNavigate();
@@ -116,6 +117,9 @@ function Login() {
 
     return (
         <>
+            <Helmet>
+                <title>Login</title>
+            </Helmet>
             {loader && <Loader />}
             <section id={styles.login}>
                 <div className={styles.left}>

@@ -11,6 +11,7 @@ import MainLoader from "../UI/MainLoader";
 import profile from "../../assets/images/blank-profile.webp";
 import { authActions } from "../../store/authSlice";
 import { alertActions } from "../../store/alertSlice";
+import { Helmet } from "react-helmet";
 
 const ProfileSettings = () => {
     const dispatch = useDispatch();
@@ -82,25 +83,28 @@ const ProfileSettings = () => {
         axios
             .patch("users/update/", formData, config)
             .then((res) => {
-                console.log(res.data);
+                console.log(res);
                 dispatch(
                     authActions.updateUserData({
                         userData: res.data.userData,
                     })
                 );
+                navigate(`/${res.data.userData.username}/`);
                 dispatch(
                     alertActions.addAlert({
                         message: "Profile Updated Successfully",
                         type: "success",
                     })
                 );
-                navigate(`/${username}/`);
             })
             .catch((err) => console.log(err));
     };
 
     return (
         <>
+            <Helmet>
+                <title>Settings</title>
+            </Helmet>
             {isLoading ? (
                 <MainLoader />
             ) : (

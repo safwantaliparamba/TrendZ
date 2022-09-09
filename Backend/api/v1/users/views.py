@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer,GetAuthor
+from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor
 from users.models import Author
 
 
@@ -36,21 +36,21 @@ def profile(request, username):
         return Response(response_obj)
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def updateImage(request):
-    data_ = request.data.get('image')
-    format, imgstr = data_.split(';base64,')
-    ext = format.split('/')[-1]
-    user = request.user.author
-    data = ContentFile(base64.b64decode(imgstr), name=f'{user.name}.' + ext)
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def updateImage(request):
+#     data_ = request.data.get('image')
+#     format, imgstr = data_.split(';base64,')
+#     ext = format.split('/')[-1]
+#     user = request.user.author
+#     data = ContentFile(base64.b64decode(imgstr), name=f'{user.name}.' + ext)
 
-    print(data)
+#     print(data)
 
-    author = Author.objects.get(pk=user.id)
-    author.image = data
-    author.save()
-    return Response('success')
+#     author = Author.objects.get(pk=user.id)
+#     author.image = data
+#     author.save()
+#     return Response('success')
 
 
 @api_view(['GET', 'PATCH'])
@@ -66,11 +66,11 @@ def editProfile(request):
         user_instance = User.objects.get(id=request.user.pk)
 
         author_data = EditAuthorSerializer(
-            instance=author_instance, data=request.data,partial=True)
+            instance=author_instance, data=request.data, partial=True)
         user_data = EditUserSerializer(
-            instance=user_instance, data=request.data,partial=True)
+            instance=user_instance, data=request.data, partial=True)
 
-
+        # converting base64 image into normal image type
         final_image = False
         if len(image) > 100:
             format, imgstr = image.split(';base64,')
@@ -84,28 +84,27 @@ def editProfile(request):
                 author_data.save(image=final_image)
             else:
                 author_data.save()
-
+            user.refresh_from_db()
             author.refresh_from_db()
-            author_updated = GetAuthor(author,context={'request':request})
+            author_updated = GetAuthor(author, context={'request': request})
             updated_image = author_updated.data['image']
-            
-            response_obj = {
-                'statusCode':6000,
-                'message':'Profile updated successfully',
-                'userData':{
-                    'username':request.user.username,
-                    'image':updated_image
-                }
-            }    
 
-    
+            response_obj = {
+                'statusCode': 6000,
+                'message': 'Profile updated successfully',
+                'userData': {
+                    'username': user.username,
+                    'image': updated_image
+                }
+            }
+
             return Response(response_obj)
 
         return Response('something went wrong')
 
     if request.method == 'GET':
         user_data = EditUserSerializer(user)
-        author_data = GetAuthor(user.author,context={'request':request})
+        author_data = GetAuthor(user.author, context={'request': request})
 
         response_obj = {
             'userData': user_data.data,
@@ -115,17 +114,19 @@ def editProfile(request):
         return Response(response_obj)
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_data(request):
     user = request.user
-    author_data = GetAuthor(user.author,context={'request':request})
+    user.refresh_from_db()
+    author_data = GetAuthor(user.author, context={'request': request})
     image = author_data.data['image']
 
     response_data = {
-        'username':user.username,
-        'image':image
+        'username': user.username,
+        'image': image
     }
 
     return Response(response_data)
+
+

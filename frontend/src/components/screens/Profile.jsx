@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate, Link, Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 import axios from "../../config/axiosConfig";
 import profile from "../../assets/images/blank-profile.webp";
@@ -41,7 +42,7 @@ function Profile() {
                     dispatch(
                         alertActions.addAlert({
                             type: "err",
-                            message: "user not found",
+                            message: "Page not found",
                         })
                     );
                 }
@@ -52,10 +53,13 @@ function Profile() {
                     dispatch(authActions.logout());
                 }
             });
-    }, [username,userData]);
+    }, [username, userData]);
 
     return (
         <>
+            <Helmet>
+                <title>{username}</title>
+            </Helmet>
             {isLoading ? (
                 <MainLoader />
             ) : (

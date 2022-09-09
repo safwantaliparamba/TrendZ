@@ -23,7 +23,7 @@ function Header() {
 
     useEffect(() => {
         console.log(userData);
-    },[userData,userData?.image]);
+    },[userData,userData?.image,userData?.username]);
 
     return (
         <>

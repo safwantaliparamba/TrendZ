@@ -1,4 +1,5 @@
 .loadWrap{
+    z-index: 50;
     position:absolute;
     width: 100%;
     height: 100vh;

@@ -13,7 +13,7 @@ class ProfileSerializer(ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Author
-        fields = '__all__'
+        exclude = ('saved_posts',)
 
 
 class EditAuthorSerializer(ModelSerializer):
@@ -24,7 +24,7 @@ class EditAuthorSerializer(ModelSerializer):
 class EditUserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('username','email')
+        fields = ('email',)
 
 class GetAuthor(ModelSerializer):
     class Meta:

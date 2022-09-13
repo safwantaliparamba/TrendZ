@@ -102,7 +102,7 @@ function Register() {
                             dispatch(
                                 authActions.googleLogin({
                                     userData: data,
-                                    profileData: response.data.userData,
+                                    authData: response.data.userData,
                                 })
                             );
                             navigate("/");

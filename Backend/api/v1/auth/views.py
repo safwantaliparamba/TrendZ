@@ -77,7 +77,8 @@ def social_auth(request):
     password = 'Safwan@#12'
     uid = request.data.get('uid')
 
-    if not Author.objects.filter(uid=uid).exists():
+    if not Author.objects.filter(uid=uid).exists() and not User.objects.filter(username=username).exists() :
+        print('author not found')
         social_serializer = SocialSerializer(data=request.data)
         if social_serializer.is_valid():
             user = User.objects.create_user(
@@ -128,6 +129,7 @@ def social_auth(request):
             return Response(response_obj)
 
     else:
+        print('user found')
         ssl = 'http'
         if request.is_secure():
             ssl = 'https'

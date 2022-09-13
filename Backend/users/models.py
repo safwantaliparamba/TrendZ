@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
-
+# from posts.models import Posts
 
 class Author(models.Model):
     name = models.CharField(max_length=255)
@@ -14,6 +14,7 @@ class Author(models.Model):
     uid = models.CharField(max_length=255,null=True,blank=True)
     provider = models.CharField(max_length=255,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    saved_posts = models.ManyToManyField('posts.Posts',related_name="saved_by")
 
     def __str__(self):
         return self.name

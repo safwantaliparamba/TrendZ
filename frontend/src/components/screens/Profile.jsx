@@ -15,6 +15,7 @@ function Profile() {
     const access = useSelector((state) => state.auth.token.access);
     const userData = useSelector((state) => state.auth.userData);
     const [userObject, setUserObject] = useState({});
+    const [posts, setPosts] = useState({});
     const [isAuthor, setIsAuthor] = useState(false);
     // const [isFollowing, setIsFollowing] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +37,7 @@ function Profile() {
                 setIsLoading(false);
                 if (res.data.statusCode !== 6001) {
                     setUserObject(res.data.data);
+                    setPosts(res.data.posts);
                     setIsAuthor(res.data.is_author);
                 } else {
                     navigate("/");
@@ -83,20 +85,7 @@ function Profile() {
                                         <img src={settings} alt="" />
                                     </Link>
                                 ) : (
-                                    <span
-                                        className="btn"
-                                        onClick={(e) =>
-                                            dispatch(
-                                                alertActions.addAlert({
-                                                    type: "success",
-                                                    message:
-                                                        "successfully following this user",
-                                                })
-                                            )
-                                        }
-                                    >
-                                        follow
-                                    </span>
+                                    <span className="btn">follow</span>
                                 )}
                             </NameContainer>
                             <FollowDetails>
@@ -116,6 +105,13 @@ function Profile() {
                             </Bio>
                         </TopRight>
                     </TopWrapper>
+                    <BottomWrapper>
+                        {posts.map((post) => (
+                            <PostWrapper key={post.id} onClick={e => navigate(`/p/${post.id}`)} >
+                                <img src={post.images[0].image} alt="" />
+                            </PostWrapper>
+                        ))}
+                    </BottomWrapper>
                     <Outlet />
                 </>
             )}
@@ -212,5 +208,31 @@ const Bio = styled.div`
         line-height: 24px;
         font-size: 17px;
         letter-spacing: 0.5px;
+    }
+`;
+
+const BottomWrapper = styled.div`
+    border-top: 1px solid #8080809c;
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: space-between; */
+    gap: 2%;
+    /* justify-content: space-between; */
+    margin: 48px auto 32px;
+    padding: 30px;
+`;
+const PostWrapper = styled.div`
+    border: 1px solid #8080809c;
+    display: inline-block;
+    width: 32%;
+    height: 280px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    img {
+        width: 500px;
+        height: 300px;
+        margin-left: -75px;
+        cursor: pointer;
     }
 `;

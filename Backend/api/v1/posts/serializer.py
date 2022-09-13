@@ -23,9 +23,10 @@ class PostSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
+    isSaved = serializers.SerializerMethodField()
     class Meta:
         model = Posts 
-        fields = ('id','images','author','location','timestamp','description','likes','isLiked')
+        fields = ('id','images','author','location','timestamp','description','likes','isLiked','isSaved')
 
     def get_likes(self,instance):
         return instance.likes.count()
@@ -40,3 +41,14 @@ class PostSerializer(serializers.ModelSerializer):
                 return False
         else:
             return False
+
+    def get_isSaved(self, instance):
+        request = self.context.get('request',None)
+        if request:
+            user = request.user.author 
+            if user.saved_posts.filter(id=instance.id).exists():
+                return True 
+            else:
+                return False 
+        else:
+            return False         

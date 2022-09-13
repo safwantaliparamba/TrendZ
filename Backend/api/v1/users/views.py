@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor
 from users.models import Author
+from api.v1.posts.serializer import PostSerializer
 
 
 @api_view(['GET'])
@@ -15,6 +16,8 @@ from users.models import Author
 def profile(request, username):
     if User.objects.filter(username=username).exists():
         user = User.objects.get(username=username)
+        posts = user.author.posts.all().order_by('-timestamp')
+
         is_author = False
         if request.user.username == username:
             is_author = True
@@ -22,10 +25,12 @@ def profile(request, username):
             'request': request
         }
         user_obj = ProfileSerializer(user.author, context=context)
+        post_obj = PostSerializer(posts,many=True,context=context)
         response_obj = {
             'statusCode': 6000,
             'data': user_obj.data,
-            'is_author': is_author
+            'is_author': is_author,
+            'posts':post_obj.data
         }
         return Response(response_obj)
     else:

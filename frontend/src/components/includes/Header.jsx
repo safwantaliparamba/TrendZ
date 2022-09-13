@@ -14,19 +14,22 @@ import bookmark from "../../assets/icons/bookmark.svg";
 import settings from "../../assets/icons/settings.svg";
 import logout from "../../assets/icons/logout.svg";
 import profile from "../../assets/images/blank-profile.webp";
+import CreatePost from "./CreatePost";
 // import { alertActions } from "../../store/alertSlice";
 
 function Header() {
     const userData = useSelector((state) => state.auth.userData);
     const dispatch = useDispatch();
     const [viewMenu, setViewMenu] = useState(false);
+    const [createPost,setCreatePost] = useState(false);
 
     useEffect(() => {
         console.log(userData);
-    },[userData,userData?.image,userData?.username]);
+    }, [userData, userData?.image, userData?.username]);
 
     return (
-        <>
+        <>  
+            {createPost && <CreatePost onClose={e => setCreatePost(false)} />}
             <header id={styles.header}>
                 <div className={styles.wrapper}>
                     <h1>
@@ -36,6 +39,7 @@ function Header() {
                                 alt=""
                             />
                         </Link>
+                        
                     </h1>
                     <form className={styles.search} action="">
                         <label htmlFor="search">
@@ -51,9 +55,9 @@ function Header() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/">
-                                    <img src={add} alt="" />
-                                </Link>
+                                <img src={add} alt="" onClick={e =>{
+                                    setCreatePost(true);
+                                }} />
                             </li>
                             <li>
                                 <Link to="/">

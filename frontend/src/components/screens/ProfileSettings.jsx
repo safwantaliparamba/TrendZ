@@ -71,7 +71,6 @@ const ProfileSettings = () => {
     const submitHandler = (e) => {
         const formData = new FormData();
         formData.append("image", image);
-        formData.append("username", userName);
         formData.append("email", email);
         formData.append("name", name);
         formData.append("bio", bio);
@@ -120,7 +119,7 @@ const ProfileSettings = () => {
                         </TopWrapper>
                         <FormWrapper>
                             <div className="left">
-                                <div className="input-container">
+                                {/* <div className="input-container">
                                     <label htmlFor="username">Username</label>
                                     <input
                                         type="text"
@@ -130,7 +129,7 @@ const ProfileSettings = () => {
                                         }
                                         value={userName}
                                     />
-                                </div>
+                                </div> */}
                                 <div className="input-container">
                                     <label htmlFor="name">Name</label>
                                     <input
@@ -184,9 +183,9 @@ const ProfileSettings = () => {
                                     ref={imageUploadRef}
                                     accept="image/*"
                                     onChange={(e) => {
-                                        var file = e.target.files[0];
-                                        var reader = new FileReader();
-                                        var url = reader.readAsDataURL(file);
+                                        let file = e.target.files[0];
+                                        let reader = new FileReader();
+                                        let url = reader.readAsDataURL(file);
 
                                         reader.onloadend = function (e) {
                                             setDemoimage(reader.result);
@@ -257,6 +256,8 @@ const MainWrapper = styled.div`
 `;
 
 const ContentWrapper = styled.div`
+    border: 1px solid #8080809c;
+    border-radius: 10px;
     width: 70%;
     margin: 100px auto;
     padding: 40px;

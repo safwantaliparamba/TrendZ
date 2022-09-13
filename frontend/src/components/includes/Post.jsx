@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
+import axios from "../../config/axiosConfig";
 import profile from "../../assets/images/blank-profile.webp";
 import save from "../../assets/icons/blank-bookmark.svg";
 import saved from "../../assets/icons/bookmark.svg";
@@ -13,10 +14,46 @@ import comment from "../../assets/icons/comment.png";
 import share from "../../assets/icons/share.png";
 import like from "../../assets/icons/love.png";
 import liked from "../../assets/icons/heart.png";
+import { useSelector } from "react-redux";
 
 const Post = ({ post }) => {
+    const navigate = useNavigate();
+
     const [isLiked, setIsLiked] = useState(post.isLiked);
-    const [isSaved, setIsSaved] = useState(false);
+    const [likeCount, setLikeCount] = useState(post.likes);
+    const [isSaved, setIsSaved] = useState(post.isSaved);
+
+    const access = useSelector((state) => state.auth.token.access);
+
+    const config = {
+        headers: {
+            authorization: `Bearer ${access}`,
+        },
+    };
+
+    const likeHandler = (e) => {
+        axios
+            .get(`posts/${post.id}/like/`, config)
+            .then((res) => {
+                console.log(res.data);
+                setIsLiked(res.data.liked);
+                setLikeCount(res.data.count);
+            })
+            .catch((e) => {
+                console.log(e.message);
+            });
+    };
+    const savePostHandler = (e) => {
+        axios
+            .get(`posts/${post.id}/save-post/`, config)
+            .then((res) => {
+                console.log(res.data);
+                setIsSaved(res.data.saved);
+            })
+            .catch((e) => {
+                console.log(e.message);
+            });
+    };
 
     const settings = {
         arrows: true,
@@ -26,6 +63,7 @@ const Post = ({ post }) => {
         slidesToShow: 1,
         slidesToScroll: 1,
         adaptiveHeight: true,
+        dots: true,
     };
 
     return (
@@ -34,7 +72,15 @@ const Post = ({ post }) => {
                 <TopWrapper>
                     <div>
                         <Link to={`/${post.author.username}/`}>
-                            <img src={post.author.image ? post.author.image : profile} alt="" />
+                            <img
+                                loading="lazy"
+                                src={
+                                    post.author.image
+                                        ? post.author.image
+                                        : profile
+                                }
+                                alt=""
+                            />
                         </Link>
                         <Link to={`/${post.author.username}/`}>
                             {post.author.username}
@@ -49,9 +95,7 @@ const Post = ({ post }) => {
                         {post.images.map((image) => (
                             <div className="slider" key={image.id}>
                                 <img
-                                    onDoubleClick={(e) => {
-                                        setIsLiked(!isLiked);
-                                    }}
+                                    onDoubleClick={likeHandler}
                                     src={image.image}
                                     alt=""
                                 />
@@ -64,23 +108,26 @@ const Post = ({ post }) => {
                         <img
                             src={isLiked ? liked : like}
                             alt=""
-                            onClick={(e) => {
-                                setIsLiked(!isLiked);
-                            }}
+                            onClick={likeHandler}
                         />
-                        <img src={comment} alt="" />
+                        <img
+                            src={comment}
+                            onClick={(e) => navigate(`/p/${post.id}/`)}
+                            alt=""
+                        />
                         <img src={share} alt="" />
                     </div>
                     <div className="bookmark">
                         <img
                             src={isSaved ? saved : save}
                             alt=""
-                            onClick={(e) => {
-                                setIsSaved(!isSaved);
-                            }}
+                            onClick={savePostHandler}
                         />
                     </div>
                 </Actions>
+                <LikeCount>
+                    {likeCount} <span>{likeCount <= 1 ? "like" : "likes"}</span>
+                </LikeCount>
                 <p>
                     <Link to={`/${post.author.username}/`}>
                         {post.author.username}
@@ -148,7 +195,7 @@ const CarouselWrapper = styled.div`
     height: auto;
     .slider {
         height: auto;
-        /* margin-bottom: 24px; */
+        /* margin-bottom: 32px; */
         img {
             width: 100%;
             cursor: pointer;
@@ -159,6 +206,7 @@ const CarouselWrapper = styled.div`
 const Actions = styled.div`
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
     padding: 10px 14px;
 
     img {
@@ -175,5 +223,12 @@ const Actions = styled.div`
         img {
             /* width:20px; */
         }
+    }
+`;
+const LikeCount = styled.span`
+    padding: 10px 14px;
+    font-weight: 600;
+    span {
+        font-weight: 400;
     }
 `;

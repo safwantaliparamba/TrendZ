@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Swal from "sweetalert2";
 
 import axios from "../../config/axiosConfig";
 import profile from "../../assets/images/blank-profile.webp";
@@ -14,16 +15,23 @@ import comment from "../../assets/icons/comment.png";
 import share from "../../assets/icons/share.png";
 import like from "../../assets/icons/love.png";
 import liked from "../../assets/icons/heart.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import PostModal from "../modal/PostModal";
+import ActionsModal from "../modal/ActionsModal";
+import { postActions } from "../../store/postSlice";
 
 const Post = ({ post }) => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [isLiked, setIsLiked] = useState(post.isLiked);
     const [likeCount, setLikeCount] = useState(post.likes);
     const [isSaved, setIsSaved] = useState(post.isSaved);
+    const [showActions, setShowActions] = useState(false);
+    const [showDetailedPost, setShowDetailedPost] = useState(false);
 
     const access = useSelector((state) => state.auth.token.access);
+    const username = useSelector((state) => state.auth.userData.username);
 
     const config = {
         headers: {
@@ -54,6 +62,32 @@ const Post = ({ post }) => {
                 console.log(e.message);
             });
     };
+    const DeletePostHandler = (e) => {
+        Swal.fire({
+            title: "Confirm!",
+            text: "Are you sure you want to delete this post?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete it",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`posts/${post.id}/delete/`, config)
+                    .then((response) => {
+                        console.log(response.data);
+                        if (response.data.statusCode === 6000) {
+                            dispatch(
+                                postActions.deletePost({ postId: post.id })
+                            );
+                            navigate(`/${username}/`);
+                        }
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                    });
+            }
+        });
+    };
 
     const settings = {
         arrows: true,
@@ -68,6 +102,55 @@ const Post = ({ post }) => {
 
     return (
         <>
+            {showActions && (
+                <ActionsModal onClose={(e) => setShowActions(false)}>
+                    <>
+                        <li className="danger">Report</li>
+                        <li
+                            onClick={(e) => {
+                                setShowDetailedPost(true);
+                                setShowActions(false);
+                            }}
+                        >
+                            Go to post
+                        </li>
+                        <li
+                            onClick={(e) => {
+                                const host =
+                                    window.location.protocol +
+                                    "//" +
+                                    window.location.host;
+                                navigator.clipboard.writeText(
+                                    `${host}/p/${post.id}/`
+                                );
+                            }}
+                        >
+                            Copy link
+                        </li>
+                        {post.isAuthor && (
+                            <>
+                                <li>Edit post</li>
+                                <li
+                                    className="danger"
+                                    onClick={DeletePostHandler}
+                                >
+                                    Delete post
+                                </li>
+                            </>
+                        )}
+                    </>
+                </ActionsModal>
+            )}
+            {showDetailedPost && (
+                <PostModal
+                    id={post.id}
+                    url="/"
+                    onClose={(e) => {
+                        setShowDetailedPost(false);
+                        window.history.replaceState(null, "", "/");
+                    }}
+                />
+            )}
             <MainWrapper>
                 <TopWrapper>
                     <div>
@@ -87,7 +170,11 @@ const Post = ({ post }) => {
                         </Link>
                     </div>
                     <div>
-                        <img src={dots} alt="" />
+                        <img
+                            src={dots}
+                            alt=""
+                            onClick={(e) => setShowActions(true)}
+                        />
                     </div>
                 </TopWrapper>
                 <CarouselWrapper>
@@ -112,7 +199,7 @@ const Post = ({ post }) => {
                         />
                         <img
                             src={comment}
-                            onClick={(e) => navigate(`/p/${post.id}/`)}
+                            onClick={(e) => setShowDetailedPost(true)}
                             alt=""
                         />
                         <img src={share} alt="" />
@@ -179,6 +266,7 @@ const TopWrapper = styled.div`
             }
             img {
                 width: 100%;
+                max-width: 500px;
                 border-radius: 50%;
             }
         }
@@ -193,6 +281,7 @@ const TopWrapper = styled.div`
 `;
 const CarouselWrapper = styled.div`
     height: auto;
+
     .slider {
         height: auto;
         /* margin-bottom: 32px; */

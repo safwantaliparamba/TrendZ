@@ -28,8 +28,9 @@ function Home() {
             .then((response) => {
                 const data = response.data;
                 console.log(data);
-                dispatch(postActions.initialPost(data))
-            }).then(res=>{
+                dispatch(postActions.initialPost(data));
+            })
+            .then((res) => {
                 setIsLoading(false);
             })
             .catch((error) => {

@@ -20,6 +20,7 @@
     "react-slick": "^0.29.0",
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.3.5",
+    "sweetalert2": "^11.4.33",
     "web-vitals": "^2.1.0"
   },
   "scripts": {

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor
+from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor, SearchSerializer
 from users.models import Author
 from api.v1.posts.serializer import PostSerializer
 
@@ -16,7 +16,8 @@ from api.v1.posts.serializer import PostSerializer
 def profile(request, username):
     if User.objects.filter(username=username).exists():
         user = User.objects.get(username=username)
-        posts = user.author.posts.all().order_by('-timestamp')
+        posts = user.author.posts.filter(
+            is_deleted=False).order_by('-timestamp')
 
         is_author = False
         if request.user.username == username:
@@ -25,12 +26,12 @@ def profile(request, username):
             'request': request
         }
         user_obj = ProfileSerializer(user.author, context=context)
-        post_obj = PostSerializer(posts,many=True,context=context)
+        post_obj = PostSerializer(posts, many=True, context=context)
         response_obj = {
             'statusCode': 6000,
             'data': user_obj.data,
             'is_author': is_author,
-            'posts':post_obj.data
+            'posts': post_obj.data
         }
         return Response(response_obj)
     else:
@@ -39,23 +40,6 @@ def profile(request, username):
             'message': 'User not found'
         }
         return Response(response_obj)
-
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def updateImage(request):
-#     data_ = request.data.get('image')
-#     format, imgstr = data_.split(';base64,')
-#     ext = format.split('/')[-1]
-#     user = request.user.author
-#     data = ContentFile(base64.b64decode(imgstr), name=f'{user.name}.' + ext)
-
-#     print(data)
-
-#     author = Author.objects.get(pk=user.id)
-#     author.image = data
-#     author.save()
-#     return Response('success')
 
 
 @api_view(['GET', 'PATCH'])
@@ -135,3 +119,60 @@ def get_user_data(request):
     return Response(response_data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def search(request):
+    q = request.GET.get('q')
+    users_instance = User.objects.filter(username__icontains=q)
+    if users_instance:
+        users = SearchSerializer(
+            users_instance, many=True, context={'request': request})
+
+        response_data = {
+            'statusCode': 6000,
+            'users': users.data
+        }
+        return Response(response_data)
+    response_data = {
+        'statusCode': 6001,
+        'users': 'user not found'
+    }
+    return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def follow_user(request, user_id):
+    if Author.objects.filter(id=user_id).exists():
+        author = request.user.author
+        other_user = Author.objects.get(id=user_id)
+
+        if not author.followings.filter(id=user_id).exists():
+            author.followings.add(other_user)
+            other_user.refresh_from_db()
+            followers_count = other_user.followers.count()
+            response_data = {
+                'statusCode': 6000,
+                'isFollowing': True,
+                'followersCount': followers_count,
+                'message': f'following {other_user.user.username} successfully'
+            }
+            return Response(response_data)
+        else:
+            author.followings.remove(other_user)
+            other_user.refresh_from_db()
+            followers_count = other_user.followers.count()
+
+            response_data = {
+                'statusCode': 6000,
+                'isFollowing': False,
+                'followersCount': followers_count,
+                'message': f'unfollowing {other_user.user.username} successfully'
+            }
+            return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'user not found'
+        }
+        return Response(response_data)

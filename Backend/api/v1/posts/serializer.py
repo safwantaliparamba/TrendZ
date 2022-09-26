@@ -16,7 +16,13 @@ class AuthorSerializer(serializers.ModelSerializer):
 class PostImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostImages
-        fields = ('image',)
+        fields = ('image','id')
+
+class PostIdSerializer(serializers.ModelSerializer):
+    images = PostImagesSerializer(many=True)
+    class Meta:
+        model = Posts 
+        fields = ('id','images') 
 
 class PostSerializer(serializers.ModelSerializer):
     images = PostImagesSerializer(many=True)
@@ -24,9 +30,10 @@ class PostSerializer(serializers.ModelSerializer):
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
     isSaved = serializers.SerializerMethodField()
+    isAuthor = serializers.SerializerMethodField()
     class Meta:
         model = Posts 
-        fields = ('id','images','author','location','timestamp','description','likes','isLiked','isSaved')
+        fields = ('id','images','author','location','timestamp','description','likes','isLiked','isSaved','isAuthor')
 
     def get_likes(self,instance):
         return instance.likes.count()
@@ -47,6 +54,17 @@ class PostSerializer(serializers.ModelSerializer):
         if request:
             user = request.user.author 
             if user.saved_posts.filter(id=instance.id).exists():
+                return True 
+            else:
+                return False 
+        else:
+            return False    
+
+    def get_isAuthor(self, instance):
+        request = self.context.get('request',None)
+        if request:
+            user = request.user.author 
+            if user == instance.author:
                 return True 
             else:
                 return False 

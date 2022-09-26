@@ -7,9 +7,9 @@ import postReducer from './postSlice'
 
 const store = configureStore({
     reducer:{
+        posts:postReducer,
         auth:authReducer,
         alert:alertReducer,
-        posts:postReducer
     }
 })
 

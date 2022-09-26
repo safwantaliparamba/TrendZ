@@ -7,12 +7,16 @@ const postSlice = createSlice({
     initialState,
     reducers: {
         addToPost(state, { payload }) {
-            // const oldState = state;
-            // oldState.push(payload);
-            return state = [payload,...state];
+            return (state = [payload, ...state]);
         },
         initialPost(state, { payload }) {
-            return state = payload;
+            return (state = payload);
+        },
+        deletePost(state, { payload }) {
+            const postId = payload.postId;
+            const posts = state;
+            const modifiedPosts = posts.filter((post) => post.id !== postId);
+            return state = modifiedPosts;
         },
     },
 });

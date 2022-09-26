@@ -1,32 +1,65 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from users.models import Author
 
 
-class UserSerializer(ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name','username','email')
+        fields = ('first_name', 'username', 'email')
 
 
-class ProfileSerializer(ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    isFollowing = serializers.SerializerMethodField()
+    followings_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Author
-        exclude = ('saved_posts',)
+        fields = ('id','name','user','image','bio','created_at','isFollowing','followings_count','followers_count')
+        # exclude = ('saved_posts',)
+
+    def get_isFollowing(self, instance):
+        request = self.context.get('request', None)
+        user = request.user.author
+        if user.followings.filter(id=instance.id).exists():
+            return True
+        else:
+            return False
+
+    def get_followings_count(self, instance):
+        return instance.followings.count()
+
+    def get_followers_count(self, instance):
+        return instance.followers.count()
 
 
-class EditAuthorSerializer(ModelSerializer):
+class EditAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ('name','bio')
+        fields = ('name', 'bio')
 
-class EditUserSerializer(ModelSerializer):
+
+class EditUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email',)
 
-class GetAuthor(ModelSerializer):
+
+class GetAuthor(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ('name','bio','image')
+        fields = ('name', 'bio', 'image')
+
+
+class SearchSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'image', 'id')
+
+    def get_image(self, instance):
+        request = self.context.get('request', None)
+        return request.build_absolute_uri(instance.author.image.url)

@@ -8,15 +8,21 @@ import arrow from "../../assets/icons/arrow.svg";
 import location from "../../assets/icons/location.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { postActions } from "../../store/postSlice";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = ({ onClose }) => {
+    // local states 
     const [isSelected, setIsSelected] = useState(false);
     const [showNextBtn, setShowNextBtn] = useState(false);
     const [postImages, setPostImages] = useState([]);
+
     const captionRef = useRef();
     const locationRef = useRef();
-    const dispatch = useDispatch()
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    // global states
     const access = useSelector((state) => state.auth.token.access);
     const userData = useSelector((state) => state.auth.userData);
 
@@ -31,7 +37,6 @@ const CreatePost = ({ onClose }) => {
         formData.append("description", captionRef.current.value);
         formData.append("location", locationRef.current.value);
 
-        
         for (let i = 1; i <= postImages.length; i++) {
             formData.append("images", postImages[i - 1]);
             console.log(postImages[i - 1]);
@@ -39,10 +44,11 @@ const CreatePost = ({ onClose }) => {
         axios
             .post("posts/create-new/", formData, config)
             .then((res) => {
-                if(res.data.statusCode === 6000){
+                if (res.data.statusCode === 6000) {
                     console.log(res.data.data);
                     dispatch(postActions.addToPost(res.data.data));
-                    onClose()
+                    onClose();
+                    navigate('/')
                 }
             })
             .catch((err) => {
@@ -229,6 +235,7 @@ const ContentWrapper = styled.div`
         img {
             width: 15%;
             border-radius: 50%;
+            margin-right: 16px;
         }
         h4 {
             font-weight: 600;

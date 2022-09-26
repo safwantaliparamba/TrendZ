@@ -1,15 +1,27 @@
+from django.db.models import Q
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from posts.models import Posts
-from .serializer import PostSerializer
-from posts.models import Posts,PostImages
+from .serializer import PostSerializer, PostIdSerializer
+from posts.models import Posts, PostImages
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_posts(request):
-    posts = Posts.objects.all().order_by('-timestamp')
+    posts = Posts.objects.filter(is_deleted=False).order_by('-timestamp')
+    # following_users = request.user.author.followings.all()
+    # posts = []
+
+    # for user in following_users:
+    #     user_posts = user.posts.all()
+    #     for post in user_posts:
+    #         posts.append(post)
+
+    # sorted_posts = posts.sort(key = lambda post: post['timestamp'])
     post_instances = PostSerializer(
         posts, many=True, context={'request': request})
 
@@ -94,10 +106,88 @@ def create_post(request):
             image=image
         )
 
-    post = PostSerializer(new_post,context={'request': request})
+    post = PostSerializer(new_post, context={'request': request})
     response_obj = {
-        'statusCode':6000,
-        'data':post.data
+        'statusCode': 6000,
+        'data': post.data
     }
 
     return Response(response_obj)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_post(request, post_id):
+    if Posts.objects.filter(Q(id=post_id) | Q(is_deleted=False)).exists():
+        post = Posts.objects.get(id=post_id)
+        post_instance = PostSerializer(post, context={'request': request})
+
+        response_data = {
+            'statusCode': 6000,
+            'data': post_instance.data
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'Post not found'
+        }
+        return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def saved_posts(request):
+    print('saved posts')
+    posts = request.user.author.saved_posts.all()
+    posts = posts.filter(is_deleted=False)
+    posts_instance = PostIdSerializer(
+        posts, many=True, context={'request': request})
+
+    response_data = {
+        'statusCode': '6000',
+        'data': posts_instance.data
+    }
+    return Response(response_data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_post(request, post_id):
+    if Posts.objects.filter(id=post_id).exists():
+        post = Posts.objects.get(id=post_id)
+        post.is_deleted = True
+        post.save()
+        response_data = {
+            'statusCode': 6000,
+            'message': f'post with id {post_id} is deleted successfully'
+        }
+        return Response(response_data)
+    response_data = {
+        'statusCode': 6000,
+        'message': f'post with {post_id} is deleted successfully'
+    }
+    return Response(response_data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_post(request, post_id):
+    if Posts.objects.filter(id=post_id).exists():
+        description = request.data.get('description')
+        location = request.data.get('location')
+        post = Posts.objects.get(id=post_id)
+        post.description = description
+        post.location = location
+        post.save()
+        response_data = {
+            'statusCode': 6000,
+            'message': 'post updated successfully'
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'post not found'
+        }
+        return Response(response_data)

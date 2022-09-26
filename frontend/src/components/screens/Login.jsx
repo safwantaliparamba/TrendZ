@@ -127,7 +127,7 @@ function Login() {
                     <div className={styles.wrapper}>
                         <div className={styles.content}>
                             <h1>
-                                <Link to="/">Hello</Link>, Friend!
+                                Hello, Friend!
                             </h1>
                             <p>
                                 Enter your personal details and start your
@@ -140,7 +140,6 @@ function Login() {
                     </div>
                 </div>
                 <div className={styles.right}>
-                    {/* <div className={styles['right-wrapp']}> */}
                     <h1>Sign in to TrendZ</h1>
                     <div className={styles.wrapp}>
                         <ul className={styles.social}>

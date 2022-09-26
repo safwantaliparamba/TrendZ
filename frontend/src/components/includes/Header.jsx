@@ -15,21 +15,23 @@ import settings from "../../assets/icons/settings.svg";
 import logout from "../../assets/icons/logout.svg";
 import profile from "../../assets/images/blank-profile.webp";
 import CreatePost from "./CreatePost";
+import Search from "./Search";
 // import { alertActions } from "../../store/alertSlice";
 
 function Header() {
     const userData = useSelector((state) => state.auth.userData);
     const dispatch = useDispatch();
     const [viewMenu, setViewMenu] = useState(false);
-    const [createPost,setCreatePost] = useState(false);
+    const [createPost, setCreatePost] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState(null);
+    const [isSearchActivated, setIsSearchActivated] = useState(false);
 
     useEffect(() => {
         console.log(userData);
     }, [userData, userData?.image, userData?.username]);
 
     return (
-        <>  
-            {createPost && <CreatePost onClose={e => setCreatePost(false)} />}
+        <>
             <header id={styles.header}>
                 <div className={styles.wrapper}>
                     <h1>
@@ -39,13 +41,21 @@ function Header() {
                                 alt=""
                             />
                         </Link>
-                        
                     </h1>
                     <form className={styles.search} action="">
                         <label htmlFor="search">
                             <img src={search} alt="" />
                         </label>
-                        <input placeholder="Search" type="search" id="search" />
+                        <input
+                            placeholder="Search"
+                            autoComplete="off"
+                            type="search"
+                            id="search"
+                            onFocus={(e) => setIsSearchActivated(true)}
+                            onChange={(e)=>{
+                                setSearchKeyword(e.target.value)
+                            }}
+                        />
                     </form>
                     <nav className={styles.nav}>
                         <ul>
@@ -55,9 +65,13 @@ function Header() {
                                 </Link>
                             </li>
                             <li>
-                                <img src={add} alt="" onClick={e =>{
-                                    setCreatePost(true);
-                                }} />
+                                <img
+                                    src={add}
+                                    alt=""
+                                    onClick={(e) => {
+                                        setCreatePost(true);
+                                    }}
+                                />
                             </li>
                             <li>
                                 <Link to="/">
@@ -99,7 +113,7 @@ function Header() {
                                     <span>Profile</span>
                                 </li>
                             </Link>
-                            <Link to="/saved">
+                            <Link to="/saved-posts/">
                                 <li>
                                     <img src={bookmark} alt="" />
                                     <span>Saved</span>
@@ -118,6 +132,10 @@ function Header() {
                         </ul>
                     </div>
                 </div>
+            )}
+            {createPost && <CreatePost onClose={(e) => setCreatePost(false)} />}
+            {isSearchActivated && (
+                <Search searchKeyword={searchKeyword} onClose={(e) => setIsSearchActivated(false)} />
             )}
         </>
     );

@@ -26,7 +26,7 @@ function Alert(props) {
 export default Alert;
 
 const AlertWrapper = styled.div`
-    z-index: 100;
+    z-index: 300;
     background-color: #ffffff79;
     position: fixed;
     top: 0;
@@ -56,7 +56,7 @@ const MainWrapper = styled.div`
       opacity: 1;
       transform: translateY(0);
     }
-  }
+  } 
 
     ${(props) =>
         props.type === "err" &&

@@ -17,6 +17,7 @@ import share from "../../assets/icons/share.png";
 import like from "../../assets/icons/love.png";
 import liked from "../../assets/icons/heart.png";
 import smile from "../../assets/icons/smile.png";
+import location from "../../assets/icons/location.svg";
 import ActionsModal from "./ActionsModal";
 import Header from "../includes/Header";
 import { postActions } from "../../store/postSlice";
@@ -43,6 +44,9 @@ const PostModal = ({
     const [likeCount, setLikeCount] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const [showEditPost, setShowEditPost] = useState(editPost);
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState("");
+    const [commentAction, setCommentAction] = useState(false);
 
     const access = useSelector((state) => state.auth.token.access);
     const username = useSelector((state) => state.auth.userData.username);
@@ -51,11 +55,6 @@ const PostModal = ({
         headers: {
             authorization: `Bearer ${access}`,
         },
-    };
-
-    const LinkHandler = (e) => {
-        onClose();
-        window.history.replaceState(null, "", url);
     };
     const likeHandler = (e) => {
         axios
@@ -109,6 +108,45 @@ const PostModal = ({
             });
     };
 
+    const create_comment = () => {
+        if (newComment.trim() !== "") {
+            axios
+                .post(
+                    `posts/${post.id}/comments/create/`,
+                    {
+                        message: newComment,
+                    },
+                    config
+                )
+                .then((res) => {
+                    console.log(res.data);
+                    setComments([res.data.data, ...comments]);
+                    setNewComment("");
+                })
+                .catch((err) => {
+                    console.log(err.message);
+                });
+        }
+    };
+
+    const deleteComment = (e) => {
+        axios
+            .delete(`posts/comments/${commentAction.id}/delete`, config)
+            .then((res) => {
+                console.log(res.data);
+                if (res.data.deleted) {
+                    const filteredComment = comments.filter(
+                        (comment) => comment.id !== commentAction.id
+                    );
+                    setComments(filteredComment);
+                    setCommentAction(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     useEffect(() => {
         if (postId && !id) {
             id = postId;
@@ -125,12 +163,16 @@ const PostModal = ({
                     setIsSaved(res.data.data.isSaved);
                     setIsLiked(res.data.data.isLiked);
                     setLikeCount(res.data.data.likes);
+                    setComments(res.data.data.comments);
                 })
                 .catch((e) => {
                     console.log(e);
                     setIsLoading(false);
                 });
         }
+        // return () => {
+        //     window.history.replaceState(null, "", url);
+        // };
     }, []);
 
     const settings = {
@@ -188,6 +230,18 @@ const PostModal = ({
                     </>
                 </ActionsModal>
             )}
+            {commentAction && (
+                <ActionsModal onClose={(e) => setCommentAction(false)}>
+                    <>
+                        <li>report</li>
+                        {commentAction.isAuthor && (
+                            <li className="danger" onClick={deleteComment}>
+                                delete
+                            </li>
+                        )}
+                    </>
+                </ActionsModal>
+            )}
             <MainWrapper
                 onClick={(e) => onClose()}
                 className={`${postId && "postId"}`}
@@ -213,19 +267,28 @@ const PostModal = ({
                                     <div className="left">
                                         <Link
                                             to={`/${post?.author?.username}/`}
-                                            onClick={LinkHandler}
                                         >
                                             <img
                                                 src={post?.author?.image}
                                                 alt=""
                                             />
                                         </Link>
-                                        <Link
-                                            to={`/${post?.author?.username}/`}
-                                            onClick={LinkHandler}
-                                        >
-                                            {post?.author?.username}
-                                        </Link>
+                                        <div className="">
+                                            <Link
+                                                to={`/${post?.author?.username}/`}
+                                            >
+                                                {post?.author?.username}
+                                            </Link>
+                                            {post.location && (
+                                                <span>
+                                                    <img
+                                                        src={location}
+                                                        alt=""
+                                                    />
+                                                    {post.location}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="right">
                                         <img
@@ -238,7 +301,73 @@ const PostModal = ({
                                     </div>
                                 </div>
                                 <div className="comments">
-                                    <p>some comments</p>
+                                    {post.description && (
+                                        <div className="comment">
+                                            <div className="left">
+                                                <Link
+                                                    to={`/${post?.author?.username}/`}
+                                                >
+                                                    <img
+                                                        src={post?.author.image}
+                                                        alt=""
+                                                    />
+                                                </Link>
+                                            </div>
+                                            <div className="right">
+                                                <p>
+                                                    {" "}
+                                                    <Link
+                                                        to={`/${post?.author?.username}/`}
+                                                    >
+                                                        {post?.author?.username}
+                                                    </Link>
+                                                    {post.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {comments?.map((comment) => (
+                                        <div
+                                            className="comment"
+                                            key={comment.id}
+                                        >
+                                            <div className="left">
+                                                <Link
+                                                    to={`/${comment?.author?.username}/`}
+                                                >
+                                                    <img
+                                                        src={
+                                                            comment.author.image
+                                                        }
+                                                        alt=""
+                                                    />
+                                                </Link>
+                                            </div>
+                                            <div className="right">
+                                                <p>
+                                                    {" "}
+                                                    <Link
+                                                        to={`/${comment?.author?.username}/`}
+                                                    >
+                                                        {
+                                                            comment.author
+                                                                .username
+                                                        }
+                                                    </Link>
+                                                    {comment.message}
+                                                </p>
+                                                <img
+                                                    src={dots}
+                                                    alt=""
+                                                    onClick={(e) =>
+                                                        setCommentAction(
+                                                            comment
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                                 <div className="bottom">
                                     <div className="actions">
@@ -267,8 +396,16 @@ const PostModal = ({
                                         <input
                                             type="text"
                                             placeholder="Add a Comment..."
+                                            onChange={(e) =>
+                                                setNewComment(e.target.value)
+                                            }
+                                            value={newComment}
                                         />
-                                        <button>Post</button>
+                                        <button
+                                            onClick={(e) => create_comment()}
+                                        >
+                                            Post
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -302,7 +439,7 @@ const MainWrapper = styled.div`
         background: #f0f0f0;
         .content-wrapper {
             margin-top: 100px;
-            width: 50%;
+            width: 60%;
             height: 80vh;
             border: 1px solid #808080;
             border-radius: 10px;
@@ -316,7 +453,7 @@ const MainWrapper = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-    width: 70%;
+    width: 80%;
     height: 93vh;
     background: #fff;
     display: flex;
@@ -369,9 +506,23 @@ const ContentWrapper = styled.div`
                         border-radius: 50%;
                     }
                 }
+                div {
+                    span {
+                        display: block;
+                        font-size: 13px;
+                        img {
+                            width: 13px;
+                            margin-right: 5px;
+                        }
+                    }
+                    a {
+                        font-size: 16px;
+                    }
+                }
 
                 a:first-child {
                     margin-right: 10px;
+                    display: inline;
                 }
             }
             .right {
@@ -386,8 +537,44 @@ const ContentWrapper = styled.div`
             width: 100%;
             height: 78%;
             max-height: 78%;
-            overflow: hidden;
-            /* background: #8888; */
+            overflow-y: scroll;
+
+            &::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            .comment {
+                padding: 10px;
+                display: flex;
+                border-bottom: 1px solid #80808027;
+
+                .left {
+                    padding: 0 10px;
+                    img {
+                        width: 30px;
+                        border-radius: 50%;
+                    }
+                }
+                .right {
+                    width: 100%;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    p {
+                        width: 80%;
+                        a {
+                            display: inline-block;
+                            color: #111;
+                            font-weight: 600;
+                            margin-right: 8px;
+                        }
+                    }
+                    img {
+                        width: 20px;
+                        cursor: pointer;
+                    }
+                }
+            }
         }
         .bottom {
             width: 100%;

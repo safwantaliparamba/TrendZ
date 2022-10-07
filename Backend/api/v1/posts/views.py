@@ -4,22 +4,21 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from posts.models import Posts
-from .serializer import PostSerializer, PostIdSerializer
+from posts.models import Posts, Comment
+from .serializer import PostSerializer, PostIdSerializer, CommentsSerializer
 from posts.models import Posts, PostImages
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_posts(request):
-    posts = Posts.objects.filter(is_deleted=False).order_by('-timestamp')
-    # following_users = request.user.author.followings.all()
-    # posts = []
+    following_users = request.user.author.following.all()
+    posts = []
 
-    # for user in following_users:
-    #     user_posts = user.posts.all()
-    #     for post in user_posts:
-    #         posts.append(post)
+    for user in following_users:
+        user_posts = user.posts.all()
+        for post in user_posts:
+            posts.append(post)
 
     # sorted_posts = posts.sort(key = lambda post: post['timestamp'])
     post_instances = PostSerializer(
@@ -189,5 +188,52 @@ def update_post(request, post_id):
         response_data = {
             'statusCode': 6001,
             'message': 'post not found'
+        }
+        return Response(response_data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_comment(request, post_id):
+    message = request.data.get('message')
+    if message is not None:
+        author = request.user.author
+        post = Posts.objects.get(id=post_id)
+        new_comment = Comment.objects.create(
+            author=author,
+            message=message,
+            post=post
+        )
+        serialized_data = CommentsSerializer(
+            new_comment, context={'request': request})
+
+        response_data = {
+            'statusCode': 6000,
+            'data': serialized_data.data
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'Comment message cannot be blank'
+        }
+        return Response(response_data)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_comment(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    if request.user.author == comment.author:
+        comment.delete()
+        response_data = {
+            'statusCode': 6000,
+            'deleted': True
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'deleted': False
         }
         return Response(response_data)

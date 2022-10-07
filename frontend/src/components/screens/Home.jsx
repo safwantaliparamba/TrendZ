@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import axios from "../../config/axiosConfig";
 import Post from "../includes/Post";
@@ -15,6 +15,7 @@ function Home() {
     const posts = useSelector((state) => state.posts);
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isEmptyPost, setIsEmptyPost] = useState(false);
 
     const config = {
         headers: {
@@ -23,12 +24,23 @@ function Home() {
     };
     useEffect(() => {
         setIsLoading(true);
+        const controller = new AbortController();
         axios
-            .get("posts/all/", config)
+            .get("posts/all/", config, {
+                signal: controller.signal,
+            })
             .then((response) => {
                 const data = response.data;
                 console.log(data);
-                dispatch(postActions.initialPost(data));
+                if (data.length === 0) {
+                    setIsEmptyPost(true);
+                    dispatch(postActions.initialPost([]));
+                } else {
+                    const sortedArray = data.sort(
+                        (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+                    );
+                    dispatch(postActions.initialPost(sortedArray.reverse()));
+                }
             })
             .then((res) => {
                 setIsLoading(false);
@@ -37,6 +49,10 @@ function Home() {
                 console.log(error);
                 setIsLoading(false);
             });
+
+        return () => {
+            controller.abort();
+        };
     }, []);
 
     return (
@@ -52,6 +68,14 @@ function Home() {
                     ))}
                 </MainWrapper>
             )}
+            {isEmptyPost && (
+                <MainWrapper empty>
+                    <div className="emptyPost">
+                        <h1>Explore to see posts</h1>
+                        <Link to="/explore/">explore</Link>
+                    </div>
+                </MainWrapper>
+            )}
             <Outlet />
         </>
     );
@@ -64,7 +88,32 @@ const MainWrapper = styled.div`
     margin: 100px auto 0;
     /* margin-top: 63px; */
     background: #f0f0f0;
+
+    ${props => props.empty && css`
+        background: inherit;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 500px;
+    `}
+
     a {
         color: red;
+    }
+    .emptyPost {
+        text-align: center;
+        h1 {
+            margin-bottom: 24px;
+            font-weight: 600;
+            color:#4f4d4d;
+        }
+        a {
+            color: #111;
+            background:#0095f6;
+            color:#fff;
+            padding:10px 20px;
+            font-weight: 600;
+            border-radius:7px;
+        }
     }
 `;

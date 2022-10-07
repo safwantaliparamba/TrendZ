@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Helmet } from "react-helmet";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -50,6 +51,9 @@ const EditPostModal = ({ onClose, post }) => {
 
     return (
         <MainWrapper onClick={onClose}>
+            <Helmet>
+                <title>Edit Post</title>
+            </Helmet>
             <ContentWrapper
                 onClick={(e) => {
                     e.stopPropagation();

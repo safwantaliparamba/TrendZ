@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor, SearchSerializer
+from .serializer import ProfileSerializer, EditAuthorSerializer, EditUserSerializer, GetAuthor, SearchSerializer,FollowingSerializer
 from users.models import Author
 from api.v1.posts.serializer import PostSerializer
 
@@ -147,8 +147,8 @@ def follow_user(request, user_id):
         author = request.user.author
         other_user = Author.objects.get(id=user_id)
 
-        if not author.followings.filter(id=user_id).exists():
-            author.followings.add(other_user)
+        if not author.following.filter(id=user_id).exists():
+            author.following.add(other_user)
             other_user.refresh_from_db()
             followers_count = other_user.followers.count()
             response_data = {
@@ -159,7 +159,7 @@ def follow_user(request, user_id):
             }
             return Response(response_data)
         else:
-            author.followings.remove(other_user)
+            author.following.remove(other_user)
             other_user.refresh_from_db()
             followers_count = other_user.followers.count()
 
@@ -170,6 +170,48 @@ def follow_user(request, user_id):
                 'message': f'unfollowing {other_user.user.username} successfully'
             }
             return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'user not found'
+        }
+        return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_followers(request, username):
+    if User.objects.filter(username=username).exists():
+        user = Author.objects.get(user__username=username)
+        followers_instance = user.followers.all()
+        followers = FollowingSerializer(
+            followers_instance, many=True, context={'request': request})
+        response_data = {
+            'statusCode': 6000,
+            'data': followers.data
+        }
+        return Response(response_data)
+    else:
+        response_data = {
+            'statusCode': 6001,
+            'message': 'user not found'
+        }
+        return Response(response_data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_following(request, username):
+    if User.objects.filter(username=username).exists():
+        user = Author.objects.get(user__username=username)
+        followers_instance = user.following.all()
+        followers = FollowingSerializer(
+            followers_instance, many=True, context={'request': request})
+        response_data = {
+            'statusCode': 6000,
+            'data': followers.data
+        }
+        return Response(response_data)
     else:
         response_data = {
             'statusCode': 6001,

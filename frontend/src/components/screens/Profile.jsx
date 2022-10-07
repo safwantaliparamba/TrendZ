@@ -131,14 +131,14 @@ function Profile() {
                             </NameContainer>
                             <FollowDetails>
                                 <h5>
-                                    <span>0</span>posts
+                                    <span>{posts.length}</span>posts
                                 </h5>
-                                <h5>
+                                <Link to={`/${username}/followers/`}>
                                     <span>{followersCount}</span>followers
-                                </h5>
-                                <h5>
+                                </Link>
+                                <Link to={`/${username}/following/`}>
                                     <span>{followingsCount}</span>followings
-                                </h5>
+                                </Link>
                             </FollowDetails>
                             <Bio>
                                 <h4>{userObject.name}</h4>
@@ -240,7 +240,7 @@ const FollowDetails = styled.div`
     justify-content: space-between;
     margin-bottom: 24px;
 
-    h5 {
+    h5,a {
         font-size: 16px;
         margin-right: 20px;
         color: #595959;

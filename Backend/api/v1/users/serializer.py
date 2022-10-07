@@ -9,6 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'username', 'email')
 
 
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     isFollowing = serializers.SerializerMethodField()
@@ -23,13 +25,13 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_isFollowing(self, instance):
         request = self.context.get('request', None)
         user = request.user.author
-        if user.followings.filter(id=instance.id).exists():
+        if user.following.filter(id=instance.id).exists():
             return True
         else:
             return False
 
     def get_followings_count(self, instance):
-        return instance.followings.count()
+        return instance.following.count()
 
     def get_followers_count(self, instance):
         return instance.followers.count()
@@ -50,7 +52,7 @@ class EditUserSerializer(serializers.ModelSerializer):
 class GetAuthor(serializers.ModelSerializer):
     class Meta:
         model = Author
-        fields = ('name', 'bio', 'image')
+        fields = ('id','name', 'bio', 'image')
 
 
 class SearchSerializer(serializers.ModelSerializer):
@@ -63,3 +65,12 @@ class SearchSerializer(serializers.ModelSerializer):
     def get_image(self, instance):
         request = self.context.get('request', None)
         return request.build_absolute_uri(instance.author.image.url)
+
+class FollowingSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    class Meta:
+        model = Author
+        fields = ('id','image','username')
+
+    def get_username(self, instance):
+        return instance.user.username

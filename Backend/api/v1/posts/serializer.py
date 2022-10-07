@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from posts.models import Posts,PostImages
+from posts.models import Posts,PostImages,Comment
 from users.models import Author
+from api.v1.users.serializer import SearchSerializer
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -22,10 +23,29 @@ class PostIdSerializer(serializers.ModelSerializer):
     images = PostImagesSerializer(many=True)
     class Meta:
         model = Posts 
-        fields = ('id','images') 
+        fields = ('id','images')
+        
+class CommentsSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    isAuthor = serializers.SerializerMethodField()
+    class Meta:
+        model = Comment
+        fields = ('id','message','author','timestamp','isAuthor')
+
+    def get_author(self,instance):
+        request = self.context.get('request', None)
+        return SearchSerializer(instance.author.user,context={'request': request}).data
+
+    def get_isAuthor(self,instance):
+        request = self.context.get('request', None)
+        if request.user.author == instance.author:
+            return True
+        else:
+            return False
 
 class PostSerializer(serializers.ModelSerializer):
     images = PostImagesSerializer(many=True)
+    comments = serializers.SerializerMethodField()
     author = AuthorSerializer(read_only=True)
     likes = serializers.SerializerMethodField()
     isLiked = serializers.SerializerMethodField()
@@ -33,7 +53,12 @@ class PostSerializer(serializers.ModelSerializer):
     isAuthor = serializers.SerializerMethodField()
     class Meta:
         model = Posts 
-        fields = ('id','images','author','location','timestamp','description','likes','isLiked','isSaved','isAuthor')
+        fields = ('id','images','author','location','timestamp','description','likes','isLiked','isSaved','isAuthor','comments')
+
+    def get_comments(self,instance):
+        request = self.context.get('request',None)
+        return CommentsSerializer(instance.comments.all().order_by('timestamp'),many=True,context={'request': request}).data
+    
 
     def get_likes(self,instance):
         return instance.likes.count()

@@ -74,7 +74,7 @@ function Header() {
                                 />
                             </li>
                             <li>
-                                <Link to="/">
+                                <Link to="/explore/">
                                     <img src={discover} alt="" />
                                 </Link>
                             </li>

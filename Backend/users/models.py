@@ -16,7 +16,7 @@ class Author(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     saved_posts = models.ManyToManyField('posts.Posts',related_name="saved_by")
 
-    followings  = models.ManyToManyField('users.Author',related_name='followers')
+    following  = models.ManyToManyField('users.Author',related_name='followers')
 
     def __str__(self):
         return self.name

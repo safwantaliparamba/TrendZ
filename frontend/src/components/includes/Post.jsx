@@ -33,6 +33,30 @@ const Post = ({ post }) => {
     const access = useSelector((state) => state.auth.token.access);
     const username = useSelector((state) => state.auth.userData.username);
 
+    function formatDate(date) {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear(),
+            hour = d.getHours(),
+            minute = d.getMinutes()
+    
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+        if(hour > 12){
+            hour -= 12
+        }
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+
+        return months[+month]+" " + day
+    
+        // return `${[day,month,year].join('-')}  ${[hour,minute].join(':')}`;
+
+    }
+
+
     const config = {
         headers: {
             authorization: `Bearer ${access}`,
@@ -221,6 +245,7 @@ const Post = ({ post }) => {
                     </Link>
                     {post.description}
                 </p>
+                <span className="time">{formatDate(post.timestamp)}</span>
             </MainWrapper>
         </>
     );
@@ -243,6 +268,11 @@ const MainWrapper = styled.div`
             font-weight: 600;
             margin-right: 10px;
         }
+    }
+    span.time{
+        padding: 0 14px;
+        font-size: 12px;
+        font-weight: 600;
     }
 `;
 const TopWrapper = styled.div`

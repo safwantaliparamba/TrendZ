@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, memo } from "react";
 import styled from "styled-components";
 import { useNavigate, useParams } from "react-router-dom";
 import Cropper from "react-cropper";
@@ -220,7 +220,7 @@ const ProfileSettings = () => {
     );
 };
 
-export default ProfileSettings;
+export default memo(ProfileSettings);
 
 const CropperWrapper = styled.div`
     /* width: 70%;

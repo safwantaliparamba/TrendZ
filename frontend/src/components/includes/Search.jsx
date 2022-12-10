@@ -112,7 +112,7 @@ const MainWrapper = styled.div`
     position: relative;
     margin-top: -20px;
     width: 400px;
-    min-height: 350px;
+    /* min-height: 350px; */
     max-height: 350px;
     background: #fff;
     overflow-y: scroll;

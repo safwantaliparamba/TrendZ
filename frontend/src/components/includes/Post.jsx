@@ -35,7 +35,7 @@ const Post = ({ post }) => {
 
     function formatDate(date) {
         let d = new Date(date),
-            month = '' + (d.getMonth() + 1),
+            month = '' + (d.getMonth() ),
             day = '' + d.getDate(),
             year = d.getFullYear(),
             hour = d.getHours(),
@@ -50,9 +50,9 @@ const Post = ({ post }) => {
         }
         const months = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
+        // console.log(`${[day,month,year].join('-')}  ${[hour,minute].join(':')}`)
         return months[+month]+" " + day
     
-        // return `${[day,month,year].join('-')}  ${[hour,minute].join(':')}`;
 
     }
 

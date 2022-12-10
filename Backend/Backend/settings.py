@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
 
+    'web',
     'users',
     'posts',
 
